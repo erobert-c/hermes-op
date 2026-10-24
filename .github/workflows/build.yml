@@ -27,7 +27,7 @@ jobs:
         run: docker run --rm --entrypoint op hermes-op:test --version
       - name: Verify PyYAML is importable from the hermes venv
         run: docker run --rm --entrypoint /opt/hermes/.venv/bin/python hermes-op:test -c "import yaml; print(yaml.__version__)"
-      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
         if: github.event_name == 'push'
         with:
           registry: ghcr.io

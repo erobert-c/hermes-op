@@ -8,6 +8,6 @@ COPY --from=1password/op:2.42.0@sha256:b0d7eebcb09bdc9d5862af91533e1851c968d4f96
 # Extra Python packages for Hermes plugins, installed into the (sealed) hermes
 # venv at build time so they survive container recreation.
 COPY requirements.txt /tmp/requirements.txt
-RUN --mount=from=ghcr.io/astral-sh/uv:0.13.7@sha256:96f40d3904aad8d0bd010539001d36c8e2188b981e1334471a90c4a1d93bb490,source=/uv,target=/usr/local/bin/uv \
+RUN --mount=from=ghcr.io/astral-sh/uv:0.13.8@sha256:5cc1805e2426484abca4ad46ea783bab281fdb225fd82d8ce6d66a81254bac85,source=/uv,target=/usr/local/bin/uv \
     uv pip install --python /opt/hermes/.venv/bin/python --no-cache -r /tmp/requirements.txt \
     && rm /tmp/requirements.txt

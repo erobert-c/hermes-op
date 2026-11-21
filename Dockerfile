@@ -16,8 +16,13 @@ RUN --mount=from=ghcr.io/astral-sh/uv:0.13.9@sha256:d3b601f0c7b118bc1753febf7c41
 # and openssh-client. Installed under /usr/local so `claude` lands on PATH.
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
 ARG CLAUDE_CODE_VERSION=2.1.330
+# Newer npm blocks dependency install scripts by default; the package needs its
+# postinstall to replace the bin stub with the native binary, hence --allow-scripts.
+# `claude --version` fails the build if the stub is still in place.
 RUN npm install -g --prefix /usr/local --no-audit --no-fund \
+        --allow-scripts=@anthropic-ai/claude-code \
         @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION} \
+    && claude --version \
     && npm cache clean --force
 
 # Keep Claude's login/state inside the mounted Hermes volume so it survives

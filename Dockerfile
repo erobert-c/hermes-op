@@ -17,7 +17,7 @@ RUN uv pip install --python /opt/hermes/.venv/bin/python --no-cache -r /tmp/requ
 
 # Go toolchain (lespelos/wep backend/go.mod requires go >= 1.26.3). Copied from the
 # official golang image so Renovate keeps tag + digest current.
-COPY --from=golang:1.26.11@sha256:4165ee6bf3b7811fd7b40373290405c83d0167dcb87ee5f29c427cdcef45ff8f /usr/local/go /usr/local/go
+COPY --from=golang:1.27.4@sha256:205c7636d74e0ffbe3d007162df7d74f859f5a8c8322dfb9f907977686c126cf /usr/local/go /usr/local/go
 ENV PATH="/usr/local/go/bin:${PATH}"
 RUN go version && uv --version
 

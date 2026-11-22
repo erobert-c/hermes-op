@@ -1,0 +1,19 @@
+name: Auto-request review
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  request-review:
+    if: github.event.pull_request.user.login == 'hermes-erobert[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api -X POST \
+            repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers \
+            -f 'reviewers[]=erobert-c'

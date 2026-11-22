@@ -1,7 +1,7 @@
 FROM nousresearch/hermes-agent:v0.23.3@sha256:3e9fe4c6ef36490f43aa0d0d80f9df64e9c92a576eee3042f1a97c8813c05355
 
 LABEL org.opencontainers.image.source="https://github.com/erobert-c/hermes-op" \
-      org.opencontainers.image.description="Nous Hermes Agent with the 1Password CLI (op), Claude Code and dev tools (gh, jq, uv, Go)"
+      org.opencontainers.image.description="Nous Hermes Agent with the 1Password CLI (op), Claude Code and dev tools (gh, jq, shellcheck, uv, Go)"
 
 COPY --from=1password/op:2.42.0@sha256:b0d7eebcb09bdc9d5862af91533e1851c968d4f969270c906f5da8c574f87e93 /usr/local/bin/op /usr/local/bin/op
 
@@ -21,11 +21,13 @@ COPY --from=golang:1.27.4@sha256:205c7636d74e0ffbe3d007162df7d74f859f5a8c8322dfb
 ENV PATH="/usr/local/go/bin:${PATH}"
 RUN go version && uv --version
 
-# jq from Debian.
+# jq and shellcheck from Debian (unpinned, like jq: they follow the base image
+# rather than Renovate).
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends jq \
+    && apt-get install -y --no-install-recommends jq shellcheck \
     && rm -rf /var/lib/apt/lists/* \
-    && jq --version
+    && jq --version \
+    && shellcheck --version
 
 # GitHub CLI: pinned release tarball verified against the release checksums file
 # (the Debian package is far older). TARGETARCH is provided by BuildKit.

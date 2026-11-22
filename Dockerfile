@@ -1,16 +1,46 @@
 FROM nousresearch/hermes-agent:v0.23.3@sha256:3e9fe4c6ef36490f43aa0d0d80f9df64e9c92a576eee3042f1a97c8813c05355
 
 LABEL org.opencontainers.image.source="https://github.com/erobert-c/hermes-op" \
-      org.opencontainers.image.description="Nous Hermes Agent with the 1Password CLI (op) and Claude Code"
+      org.opencontainers.image.description="Nous Hermes Agent with the 1Password CLI (op), Claude Code and dev tools (gh, jq, uv, Go)"
 
 COPY --from=1password/op:2.42.0@sha256:b0d7eebcb09bdc9d5862af91533e1851c968d4f969270c906f5da8c574f87e93 /usr/local/bin/op /usr/local/bin/op
+
+# uv (Python package manager). Kept in the image so the agent can create project
+# venvs at runtime; also used below to install the Hermes plugin requirements.
+COPY --from=ghcr.io/astral-sh/uv:0.13.9@sha256:d3b601f0c7b118bc1753febf7c41cc80981df678445e0254284eecf84db79a7d /uv /uvx /usr/local/bin/
 
 # Extra Python packages for Hermes plugins, installed into the (sealed) hermes
 # venv at build time so they survive container recreation.
 COPY requirements.txt /tmp/requirements.txt
-RUN --mount=from=ghcr.io/astral-sh/uv:0.13.9@sha256:d3b601f0c7b118bc1753febf7c41cc80981df678445e0254284eecf84db79a7d,source=/uv,target=/usr/local/bin/uv \
-    uv pip install --python /opt/hermes/.venv/bin/python --no-cache -r /tmp/requirements.txt \
+RUN uv pip install --python /opt/hermes/.venv/bin/python --no-cache -r /tmp/requirements.txt \
     && rm /tmp/requirements.txt
+
+# Go toolchain (lespelos/wep backend/go.mod requires go >= 1.26.3). Copied from the
+# official golang image so Renovate keeps tag + digest current.
+COPY --from=golang:1.26.11@sha256:4165ee6bf3b7811fd7b40373290405c83d0167dcb87ee5f29c427cdcef45ff8f /usr/local/go /usr/local/go
+ENV PATH="/usr/local/go/bin:${PATH}"
+RUN go version && uv --version
+
+# jq from Debian.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends jq \
+    && rm -rf /var/lib/apt/lists/* \
+    && jq --version
+
+# GitHub CLI: pinned release tarball verified against the release checksums file
+# (the Debian package is far older). TARGETARCH is provided by BuildKit.
+# renovate: datasource=github-releases depName=cli/cli
+ARG GH_VERSION=2.104.0
+ARG TARGETARCH
+RUN set -eux; \
+    mkdir /tmp/gh; cd /tmp/gh; \
+    curl -fsSLO "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_${TARGETARCH}.tar.gz"; \
+    curl -fsSLO "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_checksums.txt"; \
+    sha256sum --check --ignore-missing "gh_${GH_VERSION}_checksums.txt"; \
+    tar -xzf "gh_${GH_VERSION}_linux_${TARGETARCH}.tar.gz"; \
+    install -m 0755 "gh_${GH_VERSION}_linux_${TARGETARCH}/bin/gh" /usr/local/bin/gh; \
+    cd /; rm -r /tmp/gh; \
+    gh --version
 
 # Claude Code CLI. The base image already ships node/npm (in /usr/local/bin), git
 # and openssh-client. Installed under /usr/local so `claude` lands on PATH.

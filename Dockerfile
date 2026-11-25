@@ -47,7 +47,7 @@ RUN set -eux; \
 # Claude Code CLI. The base image already ships node/npm (in /usr/local/bin), git
 # and openssh-client. Installed under /usr/local so `claude` lands on PATH.
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
-ARG CLAUDE_CODE_VERSION=2.1.331
+ARG CLAUDE_CODE_VERSION=2.1.332
 # Newer npm blocks dependency install scripts by default; the package needs its
 # postinstall to replace the bin stub with the native binary, hence --allow-scripts.
 # `claude --version` fails the build if the stub is still in place.

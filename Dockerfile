@@ -7,7 +7,7 @@ COPY --from=1password/op:2.42.0@sha256:b0d7eebcb09bdc9d5862af91533e1851c968d4f96
 
 # uv (Python package manager). Kept in the image so the agent can create project
 # venvs at runtime; also used below to install the Hermes plugin requirements.
-COPY --from=ghcr.io/astral-sh/uv:0.13.9@sha256:d3b601f0c7b118bc1753febf7c41cc80981df678445e0254284eecf84db79a7d /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.13.10@sha256:a3ea1357342c1a4bf9a0c53a3deb1b55379aefa037338d8113d5771efa01774f /uv /uvx /usr/local/bin/
 
 # Extra Python packages for Hermes plugins, installed into the (sealed) hermes
 # venv at build time so they survive container recreation.

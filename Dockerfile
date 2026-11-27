@@ -32,7 +32,7 @@ RUN apt-get update \
 # GitHub CLI: pinned release tarball verified against the release checksums file
 # (the Debian package is far older). TARGETARCH is provided by BuildKit.
 # renovate: datasource=github-releases depName=cli/cli
-ARG GH_VERSION=2.105.0
+ARG GH_VERSION=2.106.0
 ARG TARGETARCH
 RUN set -eux; \
     mkdir /tmp/gh; cd /tmp/gh; \

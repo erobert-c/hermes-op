@@ -1,4 +1,4 @@
-FROM nousresearch/hermes-agent:v0.23.4@sha256:ef0650d523ee1b5ab32c779acabc446d9936869a9932591553688a62bcf0c42f
+FROM nousresearch/hermes-agent:v0.23.5@sha256:bc79a80fc9cb97521f4380c5d5b2ad88e2469e50fc1d5027339bbb42cc206854
 
 LABEL org.opencontainers.image.source="https://github.com/erobert-c/hermes-op" \
       org.opencontainers.image.description="Nous Hermes Agent with the 1Password CLI (op), Claude Code and dev tools (gh, jq, shellcheck, uv, Go)"
